@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Rock Paper Scissors</title>
+	<style>
+	/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+	background: #F5F5F5;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+		.hidden {
+			display: none;
+		}
+		
+		#startGame {
+			width: 100%;
+			height: 100vh;
+			position: relative;
+		}
+
+		#endResult {
+		    font-weight: bold;
+    		font-size: 1.3rem;
+    		margin-bottom: 30px;
+		}
+
+		.innerBox {
+			width: 800px;
+			margin:0 auto;
+			left: 0;
+			right: 0;
+			position: absolute;
+			top: 40%;
+			text-align: center;
+		}
+
+		button {
+			padding:15px 20px;
+			background: #1b961b;
+			color: white;
+			border-radius: 3px;
+			cursor: pointer;
+			border:none;
+			font-size: 1.1rem;
+			-webkit-transition: all 0.4s;
+			-moz-transition: all 0.4s;
+			-o-transition: all 0.4s;
+			transition: all 0.4s;
+		}
+
+		button:hover {
+			opacity: 0.8;
+		}
+
+		h5 {
+			    font-weight: bold;
+    font-size: 1.1rem;
+		}
+	</style>
+
+</head>
+<body>
+	<div id="visibleGame" class="hidden">
+		<div class="innerBox">
+			<header>
+				<h5>Your Score: <span id="playerScore">0</span></h5>
+				<h5>Computer Score: <span id="computerScore">0</span></h5>
+			</header>
+			<br/><br/>
+			Make your choice!
+			<br><br/>
+			round: <span id="round">1</span>
+			<br/><br/>
+			<div class="buttons">
+				<button data-key="Rock" class="playerChoices">Rock!</button>
+				<button data-key="Paper" class="playerChoices">Paper!</button>
+				<button data-key="Scissors" class="playerChoices">Scissors!</button>
+			</div>
+			<br/>
+			<p id="result"></p>
+		</div>
+	</div>
+
+	<div id="startGame">
+		<div class="innerBox">
+			<p id="endResult"></p>
+			<button id="start" onclick="game()">
+				PLAY!
+			</button>
+		</div>
+	</div>
+
+
+
+
+
+
+	<script>
+		// select DOM elements
+		const visibleGameElement = document.getElementById('visibleGame');
+		const startGameElement = document.getElementById('startGame');
+		const playerScoreElement = document.getElementById('playerScore');
+		const computerScoreElement = document.getElementById('computerScore');
+		const resultElement = document.getElementById('result');
+		const endResultElement = document.getElementById('endResult');
+		const roundElement = document.getElementById('round');
+		// declare score variables
+		let playerScore = 0, computerScore = 0, round = 1;
+		// returns a random computer choice
+		function computerPlay() {
+			const Choices = ['Rock', 'Paper', 'Scissors'];
+			return Choices[Math.floor(Math.random() * 3)]
+		}
+		
+		// returns the winning result of a round
+		function play(playerSelection, computerSelection) {
+			let playerCaps = playerSelection.toUpperCase();
+			let computerCaps = computerSelection.toUpperCase();
+
+			if (playerCaps === "ROCK" && computerCaps === "SCISSORS" || playerCaps === "PAPER" && computerCaps === "ROCK" || playerCaps === "SCISSORS" && computerCaps === "PAPER") {
+
+				return `You Win! ${playerSelection} beats ${computerSelection}`;
+
+
+			} else if (playerCaps === computerCaps) {
+				return "Nobody Wins";
+			} else {
+				return `You Lose! ${computerSelection} beats ${playerSelection}`;
+			}
+
+		}
+
+		// runs the game logic
+		function game() {
+			startGameElement.classList.add('hidden');
+			visibleGameElement.classList.remove('hidden');
+			// Array with player buttons
+			const Buttons = Array.from(document.querySelectorAll('.playerChoices'));
+			
+			Buttons.forEach(button => {
+				button.addEventListener('click', playRound)
+			});
+
+			function playRound(e) {
+				let choice = event.target.dataset.key;
+				let result = play(choice, computerPlay());
+
+				if (result.includes('Win!')) {
+					playerScore++;
+					playerScoreElement.innerHTML = playerScore;
+				} else if (result.includes('Lose')) {
+					computerScore++
+					computerScoreElement.innerHTML = computerScore;
+
+				}
+				resultElement.innerHTML = result;
+				round++;
+				roundElement.innerHTML = round;
+				
+				if (computerScore === 5 || playerScore === 5) {
+					endGame(computerScore, playerScore);
+				}
+
+			}
+		}
+
+		// return the winner
+		function endGame(score1, score2) {
+			startGameElement.classList.remove('hidden');
+			visibleGameElement.classList.add('hidden');
+			startButton = document.getElementById('start').innerHTML = 'PLAY AGAIN!';
+			if(score1 > score2) {
+				endResultElement.innerHTML = 'The computer Won the Game!';
+				endResultElement.style.color = "red";
+			} else {
+				endResultElement.innerHTML = 'You Won the Game!';
+				endResultElement.style.color = "black";
+			}
+			resetGame();
+		}
+
+		function resetGame() {
+			resultElement.innerHTML = "";
+			round = 1;
+			playerScore = 0;
+			computerScore = 0;
+			computerScoreElement.innerHTML = computerScore;
+			playerScoreElement.innerHTML = computerScore;
+			roundElement.innerHTML = round;
+		}
+
+
+	</script>
+	
+</body>
+</html>
